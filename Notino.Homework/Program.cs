@@ -30,7 +30,6 @@ builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -39,44 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseExceptionHandler(builder =>
-{
-    builder.Run(async context =>
-    {
-        context.Response.ContentType = "application/json";
-
-        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-        if (exceptionHandlerFeature is not null)
-        {
-            var exception = exceptionHandlerFeature.Error;
-            var statusCode = exception switch
-            {
-                MissingDocumentException _ => HttpStatusCode.NotFound,
-                DuplicateDocumentException _ => HttpStatusCode.BadRequest,
-                ValidationException _ => HttpStatusCode.BadRequest,
-                _ => HttpStatusCode.InternalServerError,
-            };
-
-            var logger = context.RequestServices.GetRequiredService<ILogger>();
-            logger.LogError(
-                exception,
-                "{RequestMethod} {RequestPath} {RequestQuery}: {Message}",
-                context.Request.Method,
-                context.Request.Path,
-                context.Request.QueryString,
-                exception.Message);
-
-            context.Response.StatusCode = (int)statusCode; 
-            var response = JsonConvert.SerializeObject(new
-            {
-                errorCode = exception.GetType().Name,
-                message = exception.Message
-            });
-
-            await context.Response.WriteAsync(response);
-        }
-    });
-});
+app.UseCustomExceptionHandler();
 
 var documentsGroup = app.MapGroup("documents").WithOpenApi();
 documentsGroup.MapPost("", async ([FromBody] Document doc, IDocumentService documentService, IValidator<Document> validator) => 
