@@ -5,6 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
 
+using Notino.Homework.Domain;
+using Notino.Homework.Domain.Interfaces;
+using Notino.Homework.Domain.Serializer;
+using Notino.Homework.Infrastructure;
+using Notino.Homework.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -13,6 +19,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging(builder => builder.AddConsole());
+
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddSingleton<ISerializerFactory, SerializerFactory>();
+builder.Services.AddSingleton<IDocumentStore, InMemoryStore>();
+builder.Services.AddSingleton<IFileFormatMapper, FileFormatMapper>();
+builder.Services.AddScoped<IValidator<Document>, DocumentValidator>();
 
 var app = builder.Build();
 
