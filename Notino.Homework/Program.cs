@@ -47,6 +47,14 @@ app.UseExceptionHandler(builder =>
         if (exceptionHandlerFeature is not null)
         {
             var exception = exceptionHandlerFeature.Error;
+            var statusCode = exception switch
+            {
+                MissingDocumentException _ => HttpStatusCode.NotFound,
+                DuplicateDocumentException _ => HttpStatusCode.BadRequest,
+                ValidationException _ => HttpStatusCode.BadRequest,
+                _ => HttpStatusCode.InternalServerError,
+            };
+
             var logger = context.RequestServices.GetRequiredService<ILogger>();
             logger.LogError(
                 exception,
@@ -56,7 +64,7 @@ app.UseExceptionHandler(builder =>
                 context.Request.QueryString,
                 exception.Message);
 
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError; 
+            context.Response.StatusCode = (int)statusCode; 
             var response = JsonConvert.SerializeObject(new
             {
                 errorCode = exception.GetType().Name,
