@@ -4,6 +4,7 @@ using FluentValidation;
 
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 
 using Newtonsoft.Json;
 
@@ -25,7 +26,7 @@ builder.Services.AddSingleton<ISerializerFactory, SerializerFactory>();
 builder.Services.AddSingleton<IDocumentStore, InMemoryStore>();
 builder.Services.AddSingleton<IFileFormatMapper, FileFormatMapper>();
 builder.Services.AddScoped<IValidator<Document>, DocumentValidator>();
-//builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
+builder.Services.AddSingleton<IMemoryCache, MemoryCache>();
 
 var app = builder.Build();
 
