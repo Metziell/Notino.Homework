@@ -1,17 +1,13 @@
-using System.Net;
-
 using FluentValidation;
 
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 
-using Newtonsoft.Json;
-
+using Notino.Homework.API;
 using Notino.Homework.Domain;
 using Notino.Homework.Domain.Interfaces;
 using Notino.Homework.Domain.Serializer;
 using Notino.Homework.Infrastructure;
+using Notino.Homework.Middleware;
 using Notino.Homework.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,24 +36,6 @@ app.UseHttpsRedirection();
 
 app.UseCustomExceptionHandler();
 
-var documentsGroup = app.MapGroup("documents").WithOpenApi();
-documentsGroup.MapPost("", async ([FromBody] Document doc, IDocumentService documentService, IValidator<Document> validator) => 
-{
-    validator.ValidateAndThrow(doc);
-    await documentService.CreateDocument(doc);
-    return Results.Ok();
-});
-documentsGroup.MapPut("", async ([FromBody] Document doc, IDocumentService documentService, IValidator<Document> validator) => 
-{
-    validator.ValidateAndThrow(doc);
-    await documentService.UpdateDocument(doc);
-    return Results.Ok();
-});
-documentsGroup.MapGet("{id}", async ([FromQuery] string id, HttpContext context, IDocumentService documentService) =>
-{
-    var targetFormat = context.Request.Headers.Accept.FirstOrDefault() ?? "application/json"; // TODO check if Accept can be null or if it's empty instead
-    var response = await documentService.GetSerializedDocument(id, targetFormat);
-    return Results.Ok(response);    
-});
+app.MapDocumentGroup();
 
 app.Run();
