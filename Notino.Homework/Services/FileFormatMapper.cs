@@ -9,6 +9,8 @@ public class FileFormatMapper : IFileFormatMapper
     {
         "application/json" => FileFormat.Json,
         "application/xml" => FileFormat.Xml,
+        "text/xml" => FileFormat.Xml,
+        "*/*" => FileFormat.Json,
         _ => throw new NotImplementedException($"{nameof(format)}: {format}")
     };
 }
