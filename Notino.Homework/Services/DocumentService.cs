@@ -9,15 +9,13 @@ public class DocumentService : IDocumentService
 {
     private readonly IDocumentStore documentStore;
     private readonly ISerializerFactory serializerFactory;
-    private readonly IFileFormatMapper fileFormatMapper;
     private readonly ILogger<IDocumentService> logger;
     private readonly IMemoryCache memoryCache;
 
-    public DocumentService(IDocumentStore documentStore, ISerializerFactory serializerFactory, IFileFormatMapper fileFormatMapper, ILogger<IDocumentService> logger, IMemoryCache memoryCache)
+    public DocumentService(IDocumentStore documentStore, ISerializerFactory serializerFactory, ILogger<IDocumentService> logger, IMemoryCache memoryCache)
     {
         this.documentStore = documentStore;
         this.serializerFactory = serializerFactory;
-        this.fileFormatMapper = fileFormatMapper;
         this.logger = logger;
         this.memoryCache = memoryCache;
     }
@@ -38,7 +36,7 @@ public class DocumentService : IDocumentService
         logger.LogInformation("Updated document with id {id}: {document}", document.Id, document);
     }
 
-    public async Task<string?> GetSerializedDocument(string id, string targetFormat)
+    public async Task<string?> GetSerializedDocument(string id, FileFormat targetFormat)
     {
         var isCached = memoryCache.TryGetValue<Document?>(id, out var document);
         if (!isCached)
@@ -53,12 +51,11 @@ public class DocumentService : IDocumentService
 
         CacheDocument(document);
 
-        var fileFormat = fileFormatMapper.Map(targetFormat);
-        var serializer = serializerFactory.Create(fileFormat);
+        var serializer = serializerFactory.Create(targetFormat);
         var serializedData = serializer.Serialize(document);
         if (string.IsNullOrWhiteSpace(serializedData))
         {
-            logger.LogWarning("Serialized document {document} in file format {format} is empty", document, fileFormat);
+            logger.LogWarning("Serialized document {document} in file format {format} is empty", document, targetFormat);
         }
 
         return serializedData;

@@ -27,10 +27,13 @@ public static class DocumentGroup
             return Results.Ok();
         });
 
-        documentsGroup.MapGet("{id}", async ([FromQuery] string id, HttpContext context, IDocumentService documentService) =>
+        documentsGroup.MapGet("{id}", async ([FromQuery] string id, HttpContext context, IDocumentService documentService, IFileFormatMapper fileFormatMapper) =>
         {
-            var targetFormat = context.Request.Headers.Accept.FirstOrDefault() ?? "application/json"; // TODO check if Accept can be null or if it's empty instead
-            var response = await documentService.GetSerializedDocument(id, targetFormat);
+            var targetFormat = context.Request.Headers.Accept.FirstOrDefault();
+            ArgumentException.ThrowIfNullOrEmpty(targetFormat, nameof(targetFormat));
+
+            var fileFormat = fileFormatMapper.Map(targetFormat);
+            var response = await documentService.GetSerializedDocument(id, fileFormat);
             return Results.Ok(response);
         });
     }
