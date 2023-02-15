@@ -2,4 +2,5 @@
 public interface IFileFormatMapper
 {
     FileFormat Map(string format);
+    string Map(FileFormat fileFormat);
 }

@@ -36,8 +36,9 @@ public static class DocumentGroup
 
             var fileFormat = fileFormatMapper.Map(targetFormat);
             var response = await documentService.GetSerializedDocument(id, fileFormat);
+            var contentType = fileFormatMapper.Map(fileFormat);
 
-            return Results.Content(response, contentType: targetFormat, statusCode: (int)HttpStatusCode.OK);
+            return Results.Content(response, contentType: contentType, statusCode: (int)HttpStatusCode.OK);
         });
     }
 }
