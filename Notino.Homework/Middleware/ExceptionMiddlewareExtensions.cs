@@ -27,8 +27,8 @@ public static class ExceptionMiddlewareExtensions
                     _ => HttpStatusCode.InternalServerError,
                 };
 
-                var logger = context.RequestServices.GetRequiredService<ILogger>();
-                logger.LogError(
+                var logger = context.RequestServices.GetService<ILogger>();
+                logger?.LogError(
                     exception,
                     "{RequestMethod} {RequestPath} {RequestQuery}: {Message}",
                     context.Request.Method,
