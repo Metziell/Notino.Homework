@@ -1,4 +1,6 @@
-﻿using FluentValidation;
+﻿using System.Net;
+
+using FluentValidation;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,7 +36,8 @@ public static class DocumentGroup
 
             var fileFormat = fileFormatMapper.Map(targetFormat);
             var response = await documentService.GetSerializedDocument(id, fileFormat);
-            return Results.Ok(response);
+
+            return Results.Content(response, contentType: targetFormat, statusCode: (int)HttpStatusCode.OK);
         });
     }
 }
