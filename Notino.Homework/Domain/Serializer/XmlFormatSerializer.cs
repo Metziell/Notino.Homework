@@ -1,5 +1,4 @@
-﻿using System.Xml.Serialization;
-
+﻿using System.Runtime.Serialization;
 using Notino.Homework.Domain.Interfaces;
 
 namespace Notino.Homework.Domain.Serializer;
@@ -11,11 +10,14 @@ public class XmlFormatSerializer : ISerializer
         {
             return string.Empty;
         }
+        
+        var serializer = new DataContractSerializer(typeof(T));
+        using var memoryStream = new MemoryStream();
+        using var reader = new StreamReader(memoryStream);
 
-        var serializer = new XmlSerializer(typeof(T));
-        using var writer = new StringWriter();
-        serializer.Serialize(writer, data);
+        serializer.WriteObject(memoryStream, data);
+        memoryStream.Position = 0;
 
-        return writer.ToString();
+        return reader.ReadToEnd();
     }
 }
