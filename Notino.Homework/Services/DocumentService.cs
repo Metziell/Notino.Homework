@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 
+using Newtonsoft.Json;
+
 using Notino.Homework.Domain;
 using Notino.Homework.Domain.Interfaces;
 
@@ -25,7 +27,7 @@ public class DocumentService : IDocumentService
         await documentStore.InsertDocument(document);
         CacheDocument(document);      
 
-        logger.LogInformation("Inserted document {document}", document);
+        logger.LogInformation("Inserted document {document}", JsonConvert.SerializeObject(document));
     }
 
     public async Task UpdateDocument(Document document)
@@ -33,7 +35,7 @@ public class DocumentService : IDocumentService
         await documentStore.UpdateDocument(document);
         CacheDocument(document);
 
-        logger.LogInformation("Updated document with id {id}: {document}", document.Id, document);
+        logger.LogInformation("Updated document with id {id}: {document}", document.Id, JsonConvert.SerializeObject(document));
     }
 
     public async Task<string?> GetSerializedDocument(string id, FileFormat targetFormat)
@@ -55,7 +57,7 @@ public class DocumentService : IDocumentService
         var serializedData = serializer.Serialize(document);
         if (string.IsNullOrWhiteSpace(serializedData))
         {
-            logger.LogWarning("Serialized document {document} in file format {format} is empty", document, targetFormat);
+            logger.LogWarning("Serialized document {document} in file format {format} is empty", JsonConvert.SerializeObject(document), targetFormat);
         }
 
         return serializedData;
