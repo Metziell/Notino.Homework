@@ -8,6 +8,6 @@ public class DuplicateDocumentException : Exception
 
 public class MissingDocumentException : Exception
 {
-	public MissingDocumentException(string documentId) : base($"A document with id {documentId} doesn't exists.")
+	public MissingDocumentException(string documentId) : base($"A document with id {documentId} doesn't exist.")
 	{ }
 }
